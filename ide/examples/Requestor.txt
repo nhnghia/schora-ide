@@ -1,0 +1,37 @@
+/*
+This script show a very simple example of 4 components: 
+ - a choreography "shop" with two roles: requestor (a) and responder (b)
+ - two local specifications: "client" & "seller"
+ - a composition of "client" and "seller"
+*/
+
+//Declare the components here. They respect either DOT language or ChorD language.
+DECLARATIONS
+	component shop STG
+		// list of states. The first state is initial of STG
+		1; 2; 3;
+		// list of transitions
+		1 -> 2 [label="request[a,b].<x>"];
+		2 -> 3 [label="[x>0] response[b,a]."];
+		2 -> 3 [label ="[x<=0] error[b,a]."];
+	end component
+	
+	component client STG
+		1; 2; 3;
+		1 -> 2 [label="request[a,b]!<x1>"];
+		2 -> 3 [label="response[b,a]?"];
+	end component
+	
+    component seller chorD
+        request[a,b]?<y1> ; response[b,a]!
+    end component
+    
+	component impl chorD
+		client || seller
+    end component
+    
+//List of commands
+COMMANDS
+	showTime	//display current system time 
+	showSTG shop client seller impl
+    conformance impl shop

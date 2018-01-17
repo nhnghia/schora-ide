@@ -1,0 +1,35 @@
+// ************************
+// Reservation Choreography
+// REF: M. Bravetti and G. Zavattaro: Towards a Unifying Theory for Choreography Conformance and Contract Compliance.
+//      In Proc. of SC'07, 2007.
+// ************************
+DECLARATIONS
+    component chor chorD
+        reservation[c,t] ; (reserve[t,a] ; confirmFlight[a,t]  | reserve[t,h] ; confirmRoom[h,t]) ; 
+        (confirmation[t,c] + cancellation[t,c])
+    end component
+    
+    component client chorD
+        reservation[c,t]! ; confirmation[t,c]?
+    end component
+
+    component travelAg chorD
+        reservation[c,t]? ; (skip ; reserve[t,a]! ; confirmFlight[a,t]? | hotel[t,h] ; 
+        confirmRoom[h,t]?) ; skip; confirmation[t,c]!
+    end component
+
+    component airline chorD
+        reserve[t,a]? ; skip; confirmFlight[a,t]!
+    end component
+
+    component hotel chorD
+        reserve[t,h]? ; skip ; confirmRoom[h,t]!
+    end component
+
+    component impl chorD
+        client || travelAg || airline || hotel
+    end component
+
+COMMANDS
+    showSTG chor client travelAg airline hotel impl
+    conformance impl chor

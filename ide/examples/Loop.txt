@@ -1,0 +1,27 @@
+// **********************
+// Example of loop
+// B require a positive number from A, then response a number 
+// *********************
+DECLARATIONS
+    component spec chorD
+        Request[a,b].<x> ; ([x <= 0] * Request[a,b].<x>) ; Response[b,a].<x1>
+    end component
+
+    component roleA chorD
+        Request[a,b]!<y> ; ([y <= 0] * Request[a,b]!<y>) ; Response[b,a]?<y1>
+    end component
+
+    component roleB chorD
+        Request[a,b]?<z> ; ([z <= 0] * Request[a,b]?<z>) ; Response[b,a]!<z1>
+    end component
+
+    component impl chorD
+        roleA || roleB
+    end component
+
+
+COMMANDS
+    showSTG spec impl
+    showTime
+    conformance impl spec
+    showTime  

@@ -1,0 +1,40 @@
+// **********************
+// Shipping choreography
+// 2 roles: client (c) & shipper (s)
+// REF: H. N. Nguyen, P. Poizat, and F. ZaIdi: A Symbolic Framework for the Conformance Checking of Value-Passing Choreographies. 
+//      In Proc. of ICSOC'2012, 2012, pp. 525-532.
+// *********************
+DECLARATIONS
+    component spec chorD
+        Request[c,s].<x_1> ; ([x_1 >= 5] |> PayShip[s,c] + [x_1 < 5] |> FreeShip[s,c])
+    end component
+    component client chorD
+        Request[c,s]!<y> ; (FreeShip[s,c]? + PayShip[s,c]?)
+    end component
+    component shipper chorD
+        Request[c,s]?z ; ([z >= 5] |> PayShip[s,c]! + [z < 5] |> FreeShip[s,c]!)
+    end component
+    component impl chorD
+        client || shipper
+    end component
+
+// Mutation 1
+    component impl1 chorD
+        Request[c,s].<y_1> ; ([y_1 >= 5] |> Tel[c,s] ; PayShip[s,c] + [y_1 <5] |> FreeShip[s,c])
+    end component
+
+// Mutation 2
+    component impl2 chorD
+        Request[c,s].<y_1> ; [y_1 >= 5] |> Tel[c,s].y ; ([y >= 10] |> PayShip[s,c] + [y < 10] |> skip + [y_1 <5] |> FreeShip[s,c])
+    end component
+
+COMMANDS
+showSTG spec client shipper impl impl1 impl2
+showStat client impl impl1 impl2
+
+
+showTime
+conformance impl spec
+conformance impl1 spec
+conformance impl2 spec
+showTime  

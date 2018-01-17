@@ -1,0 +1,76 @@
+// ********************
+// Market Choreography
+// REF: Busi, N., Gorrieri,R.,Guidi,C., Lucchi,R., Zavattaro, G.:Choreography and Orchestration Conformance for System Design. 
+//      In: Ciancarini, P., Wiklicky, H. (eds.) COORDINATION2006. LNCS, vol. 4038, pp. 63-81. Springer,Heidelberg (2006)
+// Denote
+// 10 : ACCEPTED
+// 11 : OK
+// ********************
+DECLARATIONS
+    component chor chorD
+        priceReq[c,m].good ; priceRes[m,c].price ; ([price >= 100] |> skip + [price < 100] |> (buy[c,m].card ; [card = 10] |>  (orderReq[m,s].need ; orderRes[s,m].outcome; result[m,c].out ; [outcome = 11] |> (pay[m,b].info ; receipt[b,c].receipt))))
+    end component
+    
+    component customer chorD
+        (priceReq[c,m]!x1 ; priceRes[m,c]?x2 ; ([x2 >= 100] |> skip + [x2 < 100] |> (buy[c,m]!x3 ; result[m,c]?x4))) | receipt[b,c]?x5
+    end component
+
+    component market chorD
+        priceReq[c,m]?y1 ; priceRes[m,c]!y2 | buy[c,m]?y3 ; [y3 = 10] |> 
+        (orderReq[m,s]!y4 ; orderRes[s,m]?y5 ; result[m,c]!y5 ; [y5 = 11] |> pay[m,b]!y6)
+    end component
+
+    component seller chorD
+        orderReq[m,s]?z1 ; orderRes[s,m]!z2
+    end component
+
+    component bank chorD
+        pay[m,b]?w1 ; receipt[b,c]!w2
+    end component
+
+    component impl chorD
+        customer || market || seller || bank
+    end component
+
+// Mutation
+    component seller1 chorD
+        orderReq[m,s]?z1 ; ([z1 > 10] |> (order2Req[s,s2]!z1 ; order2Res[s2,s]?z2) + 
+        [z1 <= 10] |> (order3Req[s,s3]!z1 ; order3Res[s3,s]?z2) ) ;  orderRes[s,m]!z2
+    end component
+    
+    component seller2 chorD
+        order2Req[s,s2]?zz1 ; order2Res[s2,s]!zz2
+    end component
+    
+    component seller3 chorD
+        order3Req[s,s3]?zx1 ; order3Res[s3,s]!zx2
+    end component
+
+    component bank1 chorD
+        pay[m,b]?za1 ; ([za1 > 10] |> (pay2[b,b2]!za1 ; receipt2[b2,b]?za2) + 
+        [za1 <= 10] |> (pay3[b,b3]!za1 ; receipt3[b3,b]?za2) ) ; receipt[b,c]!za2
+    end component
+    
+    component bank2 chorD
+        pay2[b,b2]?wb1 ; receipt2[b2,b]!wb2
+    end component
+
+    component bank3 chorD
+        pay3[b,b3]?wa1 ; receipt3[b3,b]!wa2
+    end component
+
+    component impl1 chorD
+        customer || market || seller1 || seller2 || seller3 || bank1 || bank2 || bank3
+    end component
+
+
+COMMANDS
+    showSTG customer market seller bank impl  chor
+    showStat customer market seller bank impl  chor
+
+    showSTG seller1 seller2 seller3 bank1 bank2 bank3 impl1
+
+    showTime
+    conformance impl chor
+    conformance impl1 chor
+    showTime

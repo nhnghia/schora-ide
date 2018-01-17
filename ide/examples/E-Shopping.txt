@@ -1,0 +1,51 @@
+/*
+This script show our examples in the paper submitted to SCC 2013.
+ - example1: unreachable transition
+ - example2: conditional branching
+ - example3: is running example of the paper 
+*/
+
+//We declare the components here. They respect DOT language.
+DECLARATIONS
+	component example1 STG
+		// list of states. The first state is initial of STG
+		1; 2; 3; 4;
+		// list of transitions
+		1 -> 2 [label="o1[a,c].<x>"];
+		2 -> 3 [label="[x>0] o2[a,b]."];
+		3 -> 4 [label ="[x<0] o3[c,d]."];
+	end component
+	
+	component example2 STG
+		1; 2; 3; 4; 
+		5 [label="-"];	//state may have a label
+		1 -> 2 [label="o1[b,d].<x>"];
+		2 -> 3 [label="o2[d,a].x"];
+		3 -> 4 [label="o3[a,c].x"];
+		4 -> 5 [label="[x>0] o4[a,b]."];
+		4 -> 5 [label="[x<=0] o5[c,d]."];
+	end component
+	
+	component example3 STG
+		0; 1; 2; 3; 4; 5; 6; 7; 8;
+		0 -> 1 [label="request[b,v].<x0>"];
+        1 -> 2 [label="_resquest[v,b].<x1>"];
+        2 -> 3 [label="request[b,v].<x0>"];
+        3 -> 2 [label="_resquest[v,b].<x1>"];
+        2 -> 4 [label="abort[v,b]."];
+        2 -> 5 [label="buy[b,v].<x0>"];
+        5 -> 6 [label="shipRequest[v,w].x0"];
+        6 -> 7 [label="_shipRequest[w,v].<x2>"];
+        7 -> 8 [label="[x2>0] ship[w,s].x0"];
+        8 -> 4 [label="confirm[v,b].<x3>"];
+        7 -> 4 [label="[x2=0] soldOut[v,b]."];	
+    end component
+//List of commands
+COMMANDS
+	showTime	//display current system time 
+	showSTG example1
+	showReachableSTG example1
+	showSTG example2
+	showRealizableSTG example2 SYNC
+	projection example2 SYNC
+	showTime

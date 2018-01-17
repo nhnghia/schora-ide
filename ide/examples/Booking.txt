@@ -1,0 +1,37 @@
+// ********************
+// Booking choreography
+// Ref: Salaun, G., Bultan, T.: Realizability of Choreographies Using Process Algebra Encodings. 
+//      In: Leuschel, M., Wehrheim, H. (eds.) IFM 2009. LNCS, vol. 5423, pp. 167Ð182. Springer, Heidelberg (2009)
+// ********************
+DECLARATIONS
+    component chor chorD
+        request[c,t] ; info[t,a] ; infoAvail[a,t] ; itinerary[a,t] ; book[t,b] ; ack[b,t] ; (result[t,c] | (invoice[b,c] + skip))
+    end component
+    
+    component customer chorD
+        request[c,t]! ; (result[t,c]? | (invoice[b,c]? + skip))
+    end component
+    
+    component booking chorD
+        book[t,b]? ; ack[b,t]! ; (invoice[b,c]! + skip)
+    end component
+
+    component train chorD
+        request[c,t]? ; info[t,a]! ; infoAvail[a,t]? ; itinerary[a,t]? ; book[t,b]! ; ack[b,t]? ; result[t,c]!
+    end component
+
+    component availability chorD
+        info[t,a]? ; infoAvail[a,t]! ; itinerary[a,t]!
+    end component
+
+    component impl chorD
+        customer || train || booking || availability
+    end component
+
+COMMANDS
+    showSTG chor customer booking train availability impl
+    showStat chor customer booking train availability impl
+
+    showTime
+    conformance impl chor
+    showTime 

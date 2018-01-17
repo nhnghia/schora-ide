@@ -1,0 +1,33 @@
+// ****************************************
+// Request For Quotation (RFQ) choreography
+// REF: Kazhamiakin, R., Pistore,M.: Choreography Conformance Analysis: Asynchronous Communications andInformationAlignment. 
+//      In:Bravetti,M., Nunez, M., Zavattaro, G. (eds.) WS-FM2006. LNCS, vol. 4184, pp. 227Ð241. Springer,Heidelberg (2006)
+// ****************************************
+DECLARATIONS
+    component chor chorD
+        request[b,s] ; offer[s,b] ; (skip + accept[b,s] ; confirm[s,b] ; orderShipment[s,h] ; confirmShipment[h,s])
+    end component
+    
+    component buyer chorD
+        request[b,s]! ; offer[s,b]? ; accept[b,s]! ; confirm[s,b]?
+    end component
+
+    component seller chorD
+        request[b,s]? ; offer[s,b]! ; (skip + accept[b,s]? ; confirm[s,b]! ; orderShipment[s,h]! ; confirmShipment[h,s]?)
+    end component
+    
+    component shipper chorD
+        orderShipment[s,h]? ; confirmShipment[h,s]!
+    end component
+
+    component impl chorD
+        buyer || seller || shipper
+    end component
+
+COMMANDS
+    showSTG chor buyer seller shipper impl
+    showStat chor impl
+
+    showTime
+    conformance impl chor
+    showTime
